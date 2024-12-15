@@ -73,27 +73,35 @@
         const html5QrCode = new Html5Qrcode("reader");
 
         function startQrScanner() {
-            html5QrCode.start(
-                { facingMode: "environment" }, // Use the back camera
-                {
-                    fps: 10, // Frames per second for scanning
-                    qrbox: 250 // QR code scanning box size
-                },
-                (decodedText, decodedResult) => {
-                    // Match the scanned QR code to the target value
-                    if (decodedText === targetQrCode) {
-                        showPopup(); // Show success popup
-                        html5QrCode.stop(); // Stop scanning after success
-                    }
-                },
-                (errorMessage) => {
-                    // Handle scanning errors (optional)
-                    console.log(`QR Code Scan Error: ${errorMessage}`);
+                // Check if camera access is supported
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    alert("Camera access is not supported by your browser.");
+                    return;
                 }
-            ).catch(err => {
-                console.error(`Error starting QR scanner: ${err}`);
-            });
-        }
+
+                html5QrCode
+                    .start(
+                        { facingMode: "environment" }, // Use the back camera
+                        {
+                            fps: 10, // Frames per second
+                            qrbox: 250 // QR scanning box size
+                        },
+                        (decodedText, decodedResult) => {
+                            if (decodedText === targetQrCode) {
+                                showPopup(); // Match found
+                                html5QrCode.stop(); // Stop scanning
+                            }
+                        },
+                        (errorMessage) => {
+                            console.log(`QR Code Scan Error: ${errorMessage}`); // Log errors
+                        }
+                    )
+                    .catch((err) => {
+                        console.error("Error starting camera:", err);
+                        alert("Unable to access the camera. Please check your permissions or try a different browser.");
+                    });
+            }
+
 
         // Show the popup when the correct QR code is scanned
         function showPopup() {
