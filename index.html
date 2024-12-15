@@ -4,72 +4,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Input and Alert Example</title>
+    <title>QR Code Scanner</title>
+    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
+            text-align: center;
             background-color: #f4f4f9;
             margin: 0;
             padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
         }
 
         .container {
-            text-align: center;
-            background: white;
-            padding: 20px 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 50px;
         }
 
-        input[type="text"] {
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            width: 80%;
-            max-width: 300px;
+        #reader {
+            width: 300px;
+            margin: 0 auto;
             margin-bottom: 20px;
         }
 
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            color: white;
-            background-color: #007BFF;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border: 1px solid #ccc;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            z-index: 10;
         }
 
-        button:hover {
-            background-color: #0056b3;
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 5;
         }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <h1>Input and Alert</h1>
-        <p>Enter something below and click the button:</p>
-        <input type="text" id="userInput" placeholder="Type something...">
-        <br>
-        <button onclick="showAlert()">Show Alert</button>
+        <h1>Scan QR Code</h1>
+        <p>Scan the QR code to perform the desired action.</p>
+        <div id="reader"></div>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+    <div class="popup" id="popup">
+        <p>Success! You scanned the correct QR code.</p>
+        <button onclick="closePopup()">Close</button>
     </div>
 
     <script>
-        function showAlert() {
-            const input = document.getElementById('userInput').value;
-            if (input.trim() === '') {
-                alert('Please enter something!');
-            } else {
-                alert(`You entered: ${input}`);
-            }
+        // The specific QR code value to validate
+        const targetQrCode = "https://nshkarshpandey.github.io/AR_Project/"; // Replace with your QR code content
+
+        // Initialize the QR Code scanner
+        const html5QrCode = new Html5Qrcode("reader");
+
+        function startQrScanner() {
+            html5QrCode.start(
+                { facingMode: "environment" }, // Use the back camera
+                {
+                    fps: 10, // Frames per second
+                    qrbox: 250 // QR scanning box size
+                },
+                (decodedText, decodedResult) => {
+                    // If the QR code matches the target, show popup
+                    if (decodedText === targetQrCode) {
+                        showPopup();
+                        html5QrCode.stop(); // Stop scanning
+                    }
+                },
+                (errorMessage) => {
+                    // Handle decode errors (optional)
+                    console.log(`QR Code Scan Error: ${errorMessage}`);
+                }
+            ).catch(err => {
+                console.error(`Error starting QR scanner: ${err}`);
+            });
         }
+
+        // Show the popup when the correct QR code is scanned
+        function showPopup() {
+            document.getElementById("popup").style.display = "block";
+            document.getElementById("overlay").style.display = "block";
+        }
+
+        // Close the popup
+        function closePopup() {
+            document.getElementById("popup").style.display = "none";
+            document.getElementById("overlay").style.display = "none";
+            startQrScanner(); // Restart scanning
+        }
+
+        // Start scanning on page load
+        window.onload = startQrScanner;
     </script>
 </body>
 
