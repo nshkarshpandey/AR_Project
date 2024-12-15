@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Code Scanner</title>
+    <title>QR Code Scanner with Camera</title>
     <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
     <style>
         body {
@@ -54,8 +54,8 @@
 
 <body>
     <div class="container">
-        <h1>Scan QR Code</h1>
-        <p>Scan the QR code to perform the desired action.</p>
+        <h1>Scan Your QR Code</h1>
+        <p>Point your camera at the QR code to verify.</p>
         <div id="reader"></div>
     </div>
 
@@ -66,8 +66,8 @@
     </div>
 
     <script>
-        // The specific QR code value to validate
-        const targetQrCode = "https://nshkarshpandey.github.io/AR_Project/"; // Replace with your QR code content
+        // The specific QR code value that is valid
+        const targetQrCode = "https://example.com/your-qrcode"; // Replace this with your QR code's value
 
         // Initialize the QR Code scanner
         const html5QrCode = new Html5Qrcode("reader");
@@ -76,18 +76,18 @@
             html5QrCode.start(
                 { facingMode: "environment" }, // Use the back camera
                 {
-                    fps: 10, // Frames per second
-                    qrbox: 250 // QR scanning box size
+                    fps: 10, // Frames per second for scanning
+                    qrbox: 250 // QR code scanning box size
                 },
                 (decodedText, decodedResult) => {
-                    // If the QR code matches the target, show popup
+                    // Match the scanned QR code to the target value
                     if (decodedText === targetQrCode) {
-                        showPopup();
-                        html5QrCode.stop(); // Stop scanning
+                        showPopup(); // Show success popup
+                        html5QrCode.stop(); // Stop scanning after success
                     }
                 },
                 (errorMessage) => {
-                    // Handle decode errors (optional)
+                    // Handle scanning errors (optional)
                     console.log(`QR Code Scan Error: ${errorMessage}`);
                 }
             ).catch(err => {
@@ -105,10 +105,10 @@
         function closePopup() {
             document.getElementById("popup").style.display = "none";
             document.getElementById("overlay").style.display = "none";
-            startQrScanner(); // Restart scanning
+            startQrScanner(); // Restart scanning after closing popup
         }
 
-        // Start scanning on page load
+        // Start the QR code scanner on page load
         window.onload = startQrScanner;
     </script>
 </body>
